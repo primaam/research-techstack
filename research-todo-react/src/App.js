@@ -1,27 +1,31 @@
 import './App.css';
+import TodoForm from './components/TodoForm';
 import TodoRowItem from './components/TodoRowItem';
-import React from 'react';
+import React, { useRef } from 'react';
 
 function App() {
   const [todosState, setTodosState] = React.useState([])
 
+  const formRef = useRef();
+  const rowItemRef = useRef();
+
   const addTodo = ()=>{
-    if(todosState.length > 0){
-      const newTodo = {
-        rowNumber: todosState.length+1,
-        rowDescription: `description ${todosState.length + 1}`,
-        rowAssigned: `user ${todosState.length +1}`
+    const getAssigned =  formRef.current.getAssignedState()
+    const getDesc = formRef.current.getDescState()
+
+    try{
+      if(getAssigned.length > 0 && getDesc.length > 0){
+        const newTodo = {
+          rowNumber: todosState.length+1,
+          rowDescription: getDesc,
+          rowAssigned: getAssigned
+        }
+        setTodosState([...todosState, newTodo])
       }
-      setTodosState([...todosState, newTodo])
-     
-    }else{
-      const newTodo = {
-        rowNumber: 1,
-        rowDescription: `description 1`,
-        rowAssigned: `user 1`
-      }
-      setTodosState([newTodo])
-      
+    }catch(e){
+      console.error(e)
+    }finally{
+      formRef.current.setDefaultState()
     }
   }
 
@@ -32,11 +36,15 @@ function App() {
           <div>
             Your Todo's
           </div>
-          <button className='btn btn-primary' onClick={addTodo}>
+          {/* <button className='btn btn-primary' onClick={addTodo}>
             Add New Todo
-          </button>
+          </button> */}
         </div>
         <div className='card-body'>
+        <TodoForm 
+          ref={formRef}
+        />
+        <button onClick={addTodo} type='button' className='btn btn-primary mt-3'>Add Todo</button>
           <table className='table table-hover'>
             <thead>
               <tr>
@@ -59,6 +67,7 @@ function App() {
             </tbody>
           </table>
 
+        
         </div>
       </div>
     </div>
